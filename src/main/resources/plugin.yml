@@ -1,0 +1,8 @@
+name: CoreNotifications
+description: CoreNotifications is an API that manages and persists notifications for players.
+author: [narrowtux, ridddle]
+main: us.corenetwork.notification.CoreNotificationsStandalonePlugin
+version: 0.1-DEV
+commands:
+  n:
+    description: Display and manage notifications
