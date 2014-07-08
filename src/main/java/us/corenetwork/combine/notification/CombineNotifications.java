@@ -1,4 +1,4 @@
-package us.corenetwork.notification;
+package us.corenetwork.combine.notification;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -15,10 +15,10 @@ import java.util.logging.Level;
  * <br/>
  * This is registered to the Bukkit Service Manager, so get the singleton instance by calling:
  * <pre>
- *     Bukkit.getServicesManager().getRegistration(CoreNotifications.class).getProvider();
+ *     Bukkit.getServicesManager().getRegistration(CombineNotifications.class).getProvider();
  * </pre>
  */
-public abstract class CoreNotifications {
+public abstract class CombineNotifications {
     /**
      * Creates the CoreNotification singleton, if not exists, and sets up database connection
      * <br/>
@@ -26,17 +26,17 @@ public abstract class CoreNotifications {
      * @param plugin the instance of the plugin which manages this instance.
      */
     public static void bootstrap(JavaPlugin plugin) {
-        if (SimpleCoreNotifications.registered || Bukkit.getServicesManager().isProvidedFor(CoreNotifications.class)) {
-            SimpleCoreNotifications.registered = true;
+        if (SimpleCombineNotifications.registered || Bukkit.getServicesManager().isProvidedFor(CombineNotifications.class)) {
+            SimpleCombineNotifications.registered = true;
             return;
         }
-        SimpleCoreNotifications instance = new SimpleCoreNotifications();
+        SimpleCombineNotifications instance = new SimpleCombineNotifications();
 
-        Bukkit.getServicesManager().register(CoreNotifications.class, instance, plugin, ServicePriority.High);
+        Bukkit.getServicesManager().register(CombineNotifications.class, instance, plugin, ServicePriority.High);
 
         plugin.getCommand("n").setExecutor(new NotificationCommandExecutor(instance));
 
-        SimpleCoreNotifications.registered = true;
+        SimpleCombineNotifications.registered = true;
     }
 
     /**
@@ -45,19 +45,19 @@ public abstract class CoreNotifications {
      * Call this in the onDisable method of your plugin.
      */
     public static void shutdown() {
-        if (SimpleCoreNotifications.shutdown) {
+        if (SimpleCombineNotifications.shutdown) {
             return;
         }
 
-        SimpleCoreNotifications instance = (SimpleCoreNotifications) Bukkit.getServicesManager().getRegistration(CoreNotifications.class).getProvider();
+        SimpleCombineNotifications instance = (SimpleCombineNotifications) Bukkit.getServicesManager().getRegistration(CombineNotifications.class).getProvider();
         try {
             instance.connectionSource.close();
         } catch (SQLException e) {
-            SimpleCoreNotifications.log.log(Level.SEVERE, "SQL Error while closing", e);
+            SimpleCombineNotifications.log.log(Level.SEVERE, "SQL Error while closing", e);
         }
         Bukkit.getServicesManager().unregister(instance);
 
-        SimpleCoreNotifications.shutdown = true;
+        SimpleCombineNotifications.shutdown = true;
     }
 
     /**

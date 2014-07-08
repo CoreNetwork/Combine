@@ -1,4 +1,4 @@
-package us.corenetwork.notification;
+package us.corenetwork.combine.notification;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -33,7 +33,7 @@ public class Template {
      * Creates a template instance. Please don't create one yourself; it confuses the system.<br/>
      *
      * Please use
-     * {@link SimpleCoreNotifications#registerTemplate(org.bukkit.plugin.Plugin, String, String) registerTemplate}
+     * {@link SimpleCombineNotifications#registerTemplate(org.bukkit.plugin.Plugin, String, String) registerTemplate}
      * to create an instance.
      * @param template the template that is displayed to the user
      * @param plugin the name of the plugin that registered the template

@@ -1,4 +1,4 @@
-package us.corenetwork.notification;
+package us.corenetwork.combine.notification;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -6,9 +6,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class NotificationCommandExecutor implements CommandExecutor {
-    private SimpleCoreNotifications notifications;
+    private SimpleCombineNotifications notifications;
 
-    public NotificationCommandExecutor(SimpleCoreNotifications notifications) {
+    public NotificationCommandExecutor(SimpleCombineNotifications notifications) {
         this.notifications = notifications;
     }
 

@@ -1,4 +1,4 @@
-package us.corenetwork.notification;
+package us.corenetwork.combine.notification;
 
 import java.util.List;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package us.corenetwork.notification;
+package us.corenetwork.combine.notification;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Set;
 
 public class SummaryManager {
-    private SimpleCoreNotifications notifications;
+    private SimpleCombineNotifications notifications;
     private LinkedHashSet<SummaryGenerator> generators = new LinkedHashSet<SummaryGenerator>();
 
-    public SummaryManager(SimpleCoreNotifications notifications) {
+    public SummaryManager(SimpleCombineNotifications notifications) {
         this.notifications = notifications;
     }
 
@@ -40,7 +40,7 @@ public class SummaryManager {
             }
             // TODO order summaries by time
         } catch (SQLException e) {
-            SimpleCoreNotifications.logSQLError(e);
+            SimpleCombineNotifications.logSQLError(e);
         }
     }
 

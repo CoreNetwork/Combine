@@ -5,8 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>us.core-network</groupId>
-    <artifactId>notifications</artifactId>
+    <artifactId>combine</artifactId>
     <version>0.1-DEV</version>
+    <name>Combine</name>
+    <description>AFK and Notification API</description>
 
 
     <repositories>

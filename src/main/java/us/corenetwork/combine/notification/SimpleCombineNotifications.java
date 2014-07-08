@@ -1,4 +1,4 @@
-package us.corenetwork.notification;
+package us.corenetwork.combine.notification;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -12,13 +12,11 @@ import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class SimpleCoreNotifications extends CoreNotifications {
+public final class SimpleCombineNotifications extends CombineNotifications {
     /**
      * Holds if there is already an instance registered in the Bukkit service manager
      */
@@ -31,7 +29,7 @@ public final class SimpleCoreNotifications extends CoreNotifications {
     /**
      * Logger instance
      */
-    static Logger log = Logger.getLogger("CoreNotifications");
+    static Logger log = Logger.getLogger("CombineNotifications");
     ConnectionSource connectionSource;
     /**
      * Data directory for anything
@@ -39,13 +37,14 @@ public final class SimpleCoreNotifications extends CoreNotifications {
     private File baseDir;
     private Dao<Notification, Integer> notificationIntegerDao;
     private Dao<Template, Integer> templateIntegerDao;
+    private Dao<PlayerReadState, Integer> playerReadStateDao;
     private SummaryManager summaryManager = new SummaryManager(this);
 
 
     /**
      * Constructor for the singleton notifications API facade. Do not use.
      */
-    SimpleCoreNotifications() {
+    SimpleCombineNotifications() {
         baseDir = new File("./plugins/NotificationStore/");
         if (!baseDir.exists()) {
             baseDir.mkdirs();
@@ -61,8 +60,10 @@ public final class SimpleCoreNotifications extends CoreNotifications {
             connectionSource = new JdbcConnectionSource(dbUrl);
             notificationIntegerDao = DaoManager.createDao(connectionSource, Notification.class);
             templateIntegerDao = DaoManager.createDao(connectionSource, Template.class);
+            playerReadStateDao = DaoManager.createDao(connectionSource, PlayerReadState.class);
             TableUtils.createTableIfNotExists(connectionSource, Notification.class);
             TableUtils.createTableIfNotExists(connectionSource, Template.class);
+            TableUtils.createTableIfNotExists(connectionSource, PlayerReadState.class);
         } catch (SQLException e) {
             logSQLError(e);
         }
@@ -93,8 +94,7 @@ public final class SimpleCoreNotifications extends CoreNotifications {
         // TODO afk detection (use afk service)
         // TODO correctly dispatch this to other online players
         if (p != null && p.isOnline()) {
-            p.sendMessage(notification.getTemplate().compile(notification.getData()));
-            notification.playerRead(p);
+            showNotification(notification, false);
         }
         try {
             notificationIntegerDao.createIfNotExists(notification);
@@ -145,6 +145,34 @@ public final class SimpleCoreNotifications extends CoreNotifications {
         } catch (SQLException e) {
             logSQLError(e);
             return null;
+        }
+    }
+
+    /**
+     * Shows the notification to all recipients.
+     * @param notification the notification to show.
+     */
+    public void showNotification(Notification notification, boolean save) {
+        // TODO afk integration
+        Player recipient = null;
+        if (notification.hasRecipient()) {
+            String text = notification.getTemplate().compile(notification.getData());
+            recipient = Bukkit.getPlayer(notification.getPlayer());
+            recipient.sendMessage(text);
+            notification.playerRead(recipient);
+        }
+        if (notification.isGlobal()) {
+            String text = notification.getBroadcastTemplate().compile(notification.getData());
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (player == recipient) {
+                    continue;
+                }
+                player.sendMessage(text);
+                notification.playerRead(player);
+            }
+        }
+        if (save) {
+            saveNotification(notification);
         }
     }
 

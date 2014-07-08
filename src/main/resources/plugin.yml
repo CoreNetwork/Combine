@@ -1,7 +1,7 @@
-name: CoreNotifications
-description: CoreNotifications is an API that manages and persists notifications for players.
+name: CombineNotifications
+description: CombineNotifications is an API that manages and persists notifications for players.
 author: [narrowtux, ridddle]
-main: us.corenetwork.notification.CoreNotificationsStandalonePlugin
+main: us.corenetwork.combine.CombinePlugin
 version: 0.1-DEV
 commands:
   n:
