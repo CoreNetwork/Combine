@@ -7,8 +7,10 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import us.corenetwork.combine.afk.CombineAFK;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -37,8 +39,8 @@ public final class SimpleCombineNotifications extends CombineNotifications {
     private File baseDir;
     private Dao<Notification, Integer> notificationIntegerDao;
     private Dao<Template, Integer> templateIntegerDao;
-    private Dao<PlayerReadState, Integer> playerReadStateDao;
     private SummaryManager summaryManager = new SummaryManager(this);
+    private CombineAFK afk;
 
 
     /**
@@ -56,14 +58,13 @@ public final class SimpleCombineNotifications extends CombineNotifications {
             return;
         }
         String dbUrl = "jdbc:sqlite:" + baseDir.getAbsolutePath() + File.separator +  "data.sqlite";
+        afk = Bukkit.getServicesManager().getRegistration(CombineAFK.class).getProvider();
         try {
             connectionSource = new JdbcConnectionSource(dbUrl);
             notificationIntegerDao = DaoManager.createDao(connectionSource, Notification.class);
             templateIntegerDao = DaoManager.createDao(connectionSource, Template.class);
-            playerReadStateDao = DaoManager.createDao(connectionSource, PlayerReadState.class);
             TableUtils.createTableIfNotExists(connectionSource, Notification.class);
             TableUtils.createTableIfNotExists(connectionSource, Template.class);
-            TableUtils.createTableIfNotExists(connectionSource, PlayerReadState.class);
         } catch (SQLException e) {
             logSQLError(e);
         }
@@ -91,8 +92,6 @@ public final class SimpleCombineNotifications extends CombineNotifications {
     @Override
     public void createNotification(Notification notification) {
         Player p = Bukkit.getPlayer(notification.getPlayer()); //TODO uuid
-        // TODO afk detection (use afk service)
-        // TODO correctly dispatch this to other online players
         if (p != null && p.isOnline()) {
             showNotification(notification, false);
         }
@@ -129,7 +128,7 @@ public final class SimpleCombineNotifications extends CombineNotifications {
      * @return an instance of the template to use with notifications later.
      */
     @Override
-    public Template registerTemplate(Plugin plugin, String code, String template) {
+    public Template registerTemplate(Plugin plugin, String code, String template, Sound sound) {
         String pluginName = plugin.getName();
         QueryBuilder<Template, Integer> queryBuilder = templateIntegerDao.queryBuilder();
 
@@ -139,6 +138,7 @@ public final class SimpleCombineNotifications extends CombineNotifications {
             if (exist == null) {
                 exist = new Template(template, pluginName, code);
             }
+            exist.setSound(sound);
             exist.setTemplate(template);
             templateIntegerDao.createOrUpdate(exist);
             return exist;
@@ -153,22 +153,26 @@ public final class SimpleCombineNotifications extends CombineNotifications {
      * @param notification the notification to show.
      */
     public void showNotification(Notification notification, boolean save) {
-        // TODO afk integration
         Player recipient = null;
         if (notification.hasRecipient()) {
             String text = notification.getTemplate().compile(notification.getData());
             recipient = Bukkit.getPlayer(notification.getPlayer());
-            recipient.sendMessage(text);
-            notification.playerRead(recipient);
+            if (!afk.isPlayerAFK(recipient)) {
+                recipient.sendMessage(text);
+                notification.playerRead();
+                recipient.playSound(recipient.getLocation(), notification.getTemplate().getSound(), 1f, 1f);
+            }
         }
         if (notification.isGlobal()) {
-            String text = notification.getBroadcastTemplate().compile(notification.getData());
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player == recipient) {
-                    continue;
+            if (recipient == null || !afk.isPlayerAFK(recipient)) {
+                String text = notification.getBroadcastTemplate().compile(notification.getData());
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player == recipient) {
+                        continue;
+                    }
+                    player.sendMessage(text);
+                    player.playSound(player.getLocation(), notification.getBroadcastTemplate().getSound(), 1f, 1f);
                 }
-                player.sendMessage(text);
-                notification.playerRead(player);
             }
         }
         if (save) {

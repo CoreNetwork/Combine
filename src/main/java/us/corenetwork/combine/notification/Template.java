@@ -1,7 +1,9 @@
 package us.corenetwork.combine.notification;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import org.bukkit.Sound;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,8 @@ public class Template {
     private String plugin;
     @DatabaseField
     private String code;
+    @DatabaseField(dataType = DataType.ENUM_STRING, canBeNull = true)
+    private Sound sound;
 
     /**
      * Empty constructor for ORMLite
@@ -84,5 +88,16 @@ public class Template {
      */
     void setTemplate(String template) {
         this.template = template;
+    }
+
+    /**
+     * @return the sound that should be played when the notification runs
+     */
+    public Sound getSound() {
+        return sound;
+    }
+
+    void setSound(Sound sound) {
+        this.sound = sound;
     }
 }

@@ -1,6 +1,7 @@
 package us.corenetwork.combine.notification;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -85,9 +86,10 @@ public abstract class CombineNotifications {
      * @param plugin the plugin that uses this template.
      * @param code a code name to differ from other templates of your plugin.
      * @param template the actual template. Variables are written like this: '&lt;Variable&gt;'; you can have as many variables as you like.
+     * @param sound the sound a notification should make when it arrives. Can be null for no sound
      * @return an instance of the template to use with notifications later.
      */
-    public abstract Template registerTemplate(Plugin plugin, String code, String template);
+    public abstract Template registerTemplate(Plugin plugin, String code, String template, Sound sound);
 
     /**
      * Saves any changes made to the given notification

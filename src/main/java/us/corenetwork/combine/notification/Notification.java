@@ -32,8 +32,8 @@ public class Notification {
     private HashMap<String, String> data = new HashMap<String, String>();
     @DatabaseField
     private long time;
-    @DatabaseField(foreign = true)
-    private List<PlayerReadState> readStates = new ArrayList<PlayerReadState>();
+    @DatabaseField(canBeNull = true)
+    private Long read;
     @DatabaseField
     private boolean invalid = false;
 
@@ -133,31 +133,17 @@ public class Notification {
     }
 
     /**
-     * @param player UUID of the player
-     * @return if the given player has read the notification
-     */
-    public boolean hasPlayerRead(UUID player) {
-        for (PlayerReadState state : readStates) {
-            if (state.getPlayer().equals(player)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Marks the notification as read by the given player
-     * @param player the player that has read the notification
      */
-    public void playerRead(Player player) {
-        readStates.add(new PlayerReadState(player.getUniqueId(), System.currentTimeMillis() / 1000));
+    public void playerRead() {
+        read = System.currentTimeMillis() / 1000;
     }
 
     /**
      * @return if the recipient has read the notification
      */
     public boolean hasPlayerRead() {
-        return hasPlayerRead(getPlayer());
+        return read != null;
     }
 
     /**
