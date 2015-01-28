@@ -35,7 +35,7 @@ public abstract class CombineNotifications {
 
         Bukkit.getServicesManager().register(CombineNotifications.class, instance, plugin, ServicePriority.High);
 
-        plugin.getCommand("n").setExecutor(new NotificationCommandExecutor(instance));
+        plugin.getCommand("inbox").setExecutor(new NotificationCommandExecutor(instance));
 
         SimpleCombineNotifications.registered = true;
     }
