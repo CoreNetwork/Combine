@@ -100,4 +100,8 @@ public class Template {
     void setSound(Sound sound) {
         this.sound = sound;
     }
+
+    public int getId() {
+        return id;
+    }
 }

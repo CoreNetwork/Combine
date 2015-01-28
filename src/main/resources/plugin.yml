@@ -1,8 +1,10 @@
-name: CombineNotifications
-description: CombineNotifications is an API that manages and persists notifications for players.
+name: Combine
+description: Combine is an API that manages and persists notifications for players.
 author: [narrowtux, ridddle]
 main: us.corenetwork.combine.CombinePlugin
 version: 0.1-DEV
 commands:
   inbox:
     description: Display and manage notifications
+  ntest:
+    description: Sends a notification to a player

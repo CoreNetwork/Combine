@@ -2,6 +2,7 @@ package us.corenetwork.combine.notification;
 
 import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.Where;
+import mkremins.fanciful.FancyMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -35,9 +36,26 @@ public class SummaryManager {
                 queryBuilder.orderBy("time", false);
                 List<Notification> notificationList = notifications.getNotificationDao().query(queryBuilder.prepare());
                 String summary = generator.generateSummary(notificationList);
+                if (summary == null) {
+                    continue;
+                }
 
-                player.sendMessage(summary);
+                StringBuilder command = new StringBuilder();
+                for (Template template : generator.getApplicableTemplates()) {
+                    command.append(' ');
+                    command.append(template.getId());
+                }
+
+                FancyMessage message = new FancyMessage()
+                        .text(summary)
+                        .command("/inbox expand" + command.toString())
+                        .tooltip("Click to expand")
+                        .then(" [x]")
+                        .tooltip("Click to check off")
+                        .command("/inbox check" + command.toString());
+                message.send(player);
             }
+            player.sendMessage(ChatColor.YELLOW + "Click on entries to expand them.");
             // TODO order summaries by time
         } catch (SQLException e) {
             SimpleCombineNotifications.logSQLError(e);

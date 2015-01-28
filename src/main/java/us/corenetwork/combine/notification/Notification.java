@@ -3,6 +3,7 @@ package us.corenetwork.combine.notification;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class Notification {
      * @param player the recipient of the notification
      * @param template the template to display to the recipient
      */
-    public Notification(Player player, Template template) {
+    public Notification(OfflinePlayer player, Template template) {
         this(player.getUniqueId(), template);
     }
 
@@ -84,7 +85,7 @@ public class Notification {
      * @param recipientTemplate the template to display to the recipient
      * @param broadcastTemplate the template to display to other players
      */
-    public Notification(Player player, Template recipientTemplate, Template broadcastTemplate) {
+    public Notification(OfflinePlayer player, Template recipientTemplate, Template broadcastTemplate) {
         this(player.getUniqueId(), recipientTemplate, broadcastTemplate);
     }
 
@@ -180,5 +181,23 @@ public class Notification {
      */
     public boolean isFullyGlobal() {
         return isGlobal() && !hasRecipient();
+    }
+
+    public String compileForPlayer() {
+        if (template != null) {
+            return template.compile(getData());
+        }
+        return null;
+    }
+
+    public String compileForGlobal() {
+        if (broadcastTemplate != null) {
+            return broadcastTemplate.compile(getData());
+        }
+        return null;
+    }
+
+    public int getId() {
+        return id;
     }
 }
